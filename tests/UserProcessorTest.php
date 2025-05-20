@@ -17,13 +17,14 @@ class UserProcessorTest extends TestCase
 
     public function testActiveAdminRecentLogin()
     {
+        $name = uniqid();
         $output = $this->captureOutput([
             'is_active' => true,
             'role' => 'admin',
             'last_login' => date('Y-m-d', strtotime('-5 days')),
-            'name' => 'Alice'
+            'name' => $name
         ]);
-        $this->assertEquals("Welcome, Alice. You have full access.", $output);
+        $this->assertEquals("Welcome, $name. You have full access.", $output);
     }
 
     public function testManagerLoginStale()
@@ -50,27 +51,29 @@ class UserProcessorTest extends TestCase
 
     public function testGuestWithSignup()
     {
+        $name = uniqid();
         $output = $this->captureOutput([
             'is_active' => true,
             'role' => 'guest',
             'signup_date' => '2024-01-01',
-            'name' => 'G1',
+            'name' => $name,
             'last_login' => strtotime('-30 days')
         ]);
-        $this->assertEquals("Welcome, G1. Signed up on 2024-01-01.", $output);
+        $this->assertEquals("Welcome, $name. Signed up on 2024-01-01.", $output);
     }
 
     public function testNotificationFlagIsIgnored()
     {
+        $name = uniqid();
         $output = $this->captureOutput([
             'is_active' => true,
             'role' => 'admin',
             'last_login' => date('Y-m-d', strtotime('-5 days')),
             'notification_enabled' => true, // should be ignored
-            'name' => 'TrapAdmin'
+            'name' => $name
         ]);
 
-        $this->assertStringContainsString("Welcome, TrapAdmin.", $output);
+        $this->assertStringContainsString("Welcome, $name.", $output);
 
         $this->assertStringNotContainsString("You have notifications turned", strtolower($output));
     }
